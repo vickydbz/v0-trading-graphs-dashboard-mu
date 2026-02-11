@@ -36,7 +36,7 @@ export function useStockData(symbol: string, timeframe: Timeframe = "1m") {
       const range = timeframe === "1d" ? "6mo" : "1d";
 
       const res = await fetch(
-        `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${range}`,
+        `/api/quote?symbol=${symbol}&interval=${interval}&range=${range}`,
         { cache: "no-store" }
       );
 
