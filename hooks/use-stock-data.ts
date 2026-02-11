@@ -22,7 +22,8 @@ export function useStockData(symbol: string, timeframe: Timeframe = "1m") {
   const [isValidating, setIsValidating] = useState(false);
   const [isError, setIsError] = useState(false);
 
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<any>(null);
+
 
   // -----------------------------
   // FETCH DATA FROM YAHOO
