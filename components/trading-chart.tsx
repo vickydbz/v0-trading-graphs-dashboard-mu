@@ -4,12 +4,8 @@ import { useEffect, useRef, useCallback } from "react";
 import {
   createChart,
   type IChartApi,
-  type ISeriesApi,
   ColorType,
   CrosshairMode,
-  type CandlestickSeriesOptions,
-  type LineSeriesOptions,
-  type HistogramSeriesOptions,
 } from "lightweight-charts";
 import type { OHLCData } from "@/lib/stock-data";
 import {
@@ -105,14 +101,14 @@ export function TradingChart({
 
     // Price series
     if (chartType === "candlestick") {
-      const candleSeries = mainChart.addSeries("Candlestick", {
+      const candleSeries = mainChart.addCandlestickSeries({
         upColor: "#26a65b",
         downColor: "#ef5350",
         borderUpColor: "#26a65b",
         borderDownColor: "#ef5350",
         wickUpColor: "#26a65b",
         wickDownColor: "#ef5350",
-      } as CandlestickSeriesOptions);
+      });
       candleSeries.setData(
         data.map((d) => ({
           time: d.time,
@@ -123,12 +119,12 @@ export function TradingChart({
         }))
       );
     } else {
-      const lineSeries = mainChart.addSeries("Line", {
+      const lineSeries = mainChart.addLineSeries({
         color: "#3b82f6",
         lineWidth: 2,
         crosshairMarkerVisible: true,
         crosshairMarkerRadius: 4,
-      } as LineSeriesOptions);
+      });
       lineSeries.setData(
         data.map((d) => ({ time: d.time, value: d.close }))
       );
@@ -136,10 +132,10 @@ export function TradingChart({
 
     // Volume overlay
     if (indicators.includes("volume")) {
-      const volumeSeries = mainChart.addSeries("Histogram", {
+      const volumeSeries = mainChart.addHistogramSeries({
         priceFormat: { type: "volume" },
         priceScaleId: "volume",
-      } as HistogramSeriesOptions);
+      });
       volumeSeries.priceScale().applyOptions({
         scaleMargins: { top: 0.8, bottom: 0 },
       });
@@ -158,51 +154,51 @@ export function TradingChart({
     // SMA overlay
     if (indicators.includes("sma")) {
       const sma20 = calculateSMA(data, 20);
-      const smaSeries = mainChart.addSeries("Line", {
+      const smaSeries = mainChart.addLineSeries({
         color: "#f59e0b",
         lineWidth: 1,
         crosshairMarkerVisible: false,
         title: "SMA 20",
-      } as LineSeriesOptions);
+      });
       smaSeries.setData(sma20);
     }
 
     // EMA overlay
     if (indicators.includes("ema")) {
       const ema12 = calculateEMA(data, 12);
-      const emaSeries = mainChart.addSeries("Line", {
+      const emaSeries = mainChart.addLineSeries({
         color: "#a78bfa",
         lineWidth: 1,
         crosshairMarkerVisible: false,
         title: "EMA 12",
-      } as LineSeriesOptions);
+      });
       emaSeries.setData(ema12);
     }
 
     // Bollinger Bands
     if (indicators.includes("bollinger")) {
       const bb = calculateBollingerBands(data);
-      const upperSeries = mainChart.addSeries("Line", {
+      const upperSeries = mainChart.addLineSeries({
         color: "rgba(59, 130, 246, 0.5)",
         lineWidth: 1,
         crosshairMarkerVisible: false,
         title: "BB Upper",
-      } as LineSeriesOptions);
+      });
       upperSeries.setData(bb.upper);
 
-      const middleSeries = mainChart.addSeries("Line", {
+      const middleSeries = mainChart.addLineSeries({
         color: "rgba(59, 130, 246, 0.3)",
         lineWidth: 1,
         crosshairMarkerVisible: false,
-      } as LineSeriesOptions);
+      });
       middleSeries.setData(bb.middle);
 
-      const lowerSeries = mainChart.addSeries("Line", {
+      const lowerSeries = mainChart.addLineSeries({
         color: "rgba(59, 130, 246, 0.5)",
         lineWidth: 1,
         crosshairMarkerVisible: false,
         title: "BB Lower",
-      } as LineSeriesOptions);
+      });
       lowerSeries.setData(bb.lower);
     }
 
@@ -224,25 +220,25 @@ export function TradingChart({
       if (indicators.includes("macd")) {
         const macd = calculateMACD(data);
 
-        const macdSeries = indicatorChart.addSeries("Line", {
+        const macdSeries = indicatorChart.addLineSeries({
           color: "#3b82f6",
           lineWidth: 1,
           title: "MACD",
           crosshairMarkerVisible: false,
-        } as LineSeriesOptions);
+        });
         macdSeries.setData(macd.macdLine);
 
-        const signalSeries = indicatorChart.addSeries("Line", {
+        const signalSeries = indicatorChart.addLineSeries({
           color: "#ef5350",
           lineWidth: 1,
           title: "Signal",
           crosshairMarkerVisible: false,
-        } as LineSeriesOptions);
+        });
         signalSeries.setData(macd.signalLine);
 
-        const histogramSeries = indicatorChart.addSeries("Histogram", {
+        const histogramSeries = indicatorChart.addHistogramSeries({
           priceScaleId: "histogram",
-        } as HistogramSeriesOptions);
+        });
         histogramSeries.priceScale().applyOptions({
           scaleMargins: { top: 0.6, bottom: 0 },
         });
@@ -251,73 +247,73 @@ export function TradingChart({
 
       if (indicators.includes("rsi")) {
         const rsi = calculateRSI(data);
-        const rsiSeries = indicatorChart.addSeries("Line", {
+        const rsiSeries = indicatorChart.addLineSeries({
           color: "#a78bfa",
           lineWidth: 1,
           title: "RSI",
           crosshairMarkerVisible: false,
-        } as LineSeriesOptions);
+        });
         rsiSeries.setData(rsi);
 
         // Overbought/oversold reference lines
         const overbought = rsi.map((d) => ({ time: d.time, value: 70 }));
         const oversold = rsi.map((d) => ({ time: d.time, value: 30 }));
 
-        const obSeries = indicatorChart.addSeries("Line", {
+        const obSeries = indicatorChart.addLineSeries({
           color: "rgba(239, 83, 80, 0.3)",
           lineWidth: 1,
           crosshairMarkerVisible: false,
           lineStyle: 2,
-        } as LineSeriesOptions);
+        });
         obSeries.setData(overbought);
 
-        const osSeries = indicatorChart.addSeries("Line", {
+        const osSeries = indicatorChart.addLineSeries({
           color: "rgba(38, 166, 91, 0.3)",
           lineWidth: 1,
           crosshairMarkerVisible: false,
           lineStyle: 2,
-        } as LineSeriesOptions);
+        });
         osSeries.setData(oversold);
       }
 
       if (indicators.includes("stochastic")) {
         const stoch = calculateStochastic(data);
 
-        const kSeries = indicatorChart.addSeries("Line", {
+        const kSeries = indicatorChart.addLineSeries({
           color: "#3b82f6",
           lineWidth: 1,
           title: "%K",
           crosshairMarkerVisible: false,
-        } as LineSeriesOptions);
+        });
         kSeries.setData(stoch.kLine);
 
-        const dSeries = indicatorChart.addSeries("Line", {
+        const dSeries = indicatorChart.addLineSeries({
           color: "#ef5350",
           lineWidth: 1,
           title: "%D",
           crosshairMarkerVisible: false,
-        } as LineSeriesOptions);
+        });
         dSeries.setData(stoch.dLine);
 
         // Reference lines
         const obLine = stoch.kLine.map((d) => ({ time: d.time, value: 80 }));
         const osLine = stoch.kLine.map((d) => ({ time: d.time, value: 20 }));
 
-        const obSeries = indicatorChart.addSeries("Line", {
+        const obSeries2 = indicatorChart.addLineSeries({
           color: "rgba(239, 83, 80, 0.3)",
           lineWidth: 1,
           crosshairMarkerVisible: false,
           lineStyle: 2,
-        } as LineSeriesOptions);
-        obSeries.setData(obLine);
+        });
+        obSeries2.setData(obLine);
 
-        const osSeries = indicatorChart.addSeries("Line", {
+        const osSeries2 = indicatorChart.addLineSeries({
           color: "rgba(38, 166, 91, 0.3)",
           lineWidth: 1,
           crosshairMarkerVisible: false,
           lineStyle: 2,
-        } as LineSeriesOptions);
-        osSeries.setData(osLine);
+        });
+        osSeries2.setData(osLine);
       }
 
       indicatorChart.timeScale().fitContent();
