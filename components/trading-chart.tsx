@@ -32,6 +32,9 @@ interface TradingChartProps {
   chartType: ChartType;
   indicators: Indicator[];
   symbol: string;
+  currency?: string;
+  livePrice?: number | null;
+  previousClose?: number | null;
 }
 
 export function TradingChart({
@@ -39,6 +42,9 @@ export function TradingChart({
   chartType,
   indicators,
   symbol,
+  currency = "USD",
+  livePrice,
+  previousClose,
 }: TradingChartProps) {
   const mainChartRef = useRef<HTMLDivElement>(null);
   const indicatorChartRef = useRef<HTMLDivElement>(null);
@@ -364,16 +370,34 @@ export function TradingChart({
 
   const lastPrice = data[data.length - 1];
   const prevPrice = data[data.length - 2];
-  const priceChange = lastPrice.close - prevPrice.close;
-  const priceChangePercent = (priceChange / prevPrice.close) * 100;
+
+  // Use live price if available, otherwise use last candle close
+  const displayPrice = livePrice ?? lastPrice.close;
+  const refPrice = previousClose ?? prevPrice.close;
+  const priceChange = displayPrice - refPrice;
+  const priceChangePercent = refPrice ? (priceChange / refPrice) * 100 : 0;
   const isPositive = priceChange >= 0;
+
+  const formatPrice = (val: number) => {
+    if (currency === "IDR") {
+      return `Rp${val.toLocaleString("id-ID", { maximumFractionDigits: 0 })}`;
+    }
+    return `$${val.toFixed(2)}`;
+  };
+
+  const formatChangeVal = (val: number) => {
+    if (currency === "IDR") {
+      return val.toLocaleString("id-ID", { maximumFractionDigits: 0 });
+    }
+    return val.toFixed(2);
+  };
 
   return (
     <div className="flex flex-col">
       {/* Price header */}
-      <div className="flex items-baseline gap-4 px-4 py-3 border-b border-border">
+      <div className="flex items-baseline gap-4 px-4 py-3 border-b border-border flex-wrap">
         <span className="text-2xl font-semibold text-foreground font-mono">
-          ${lastPrice.close.toFixed(2)}
+          {formatPrice(displayPrice)}
         </span>
         <span
           className={`text-sm font-mono font-medium ${
@@ -381,12 +405,12 @@ export function TradingChart({
           }`}
         >
           {isPositive ? "+" : ""}
-          {priceChange.toFixed(2)} ({isPositive ? "+" : ""}
+          {formatChangeVal(priceChange)} ({isPositive ? "+" : ""}
           {priceChangePercent.toFixed(2)}%)
         </span>
-        <span className="text-xs text-muted-foreground">
-          O: {lastPrice.open.toFixed(2)} H: {lastPrice.high.toFixed(2)} L:{" "}
-          {lastPrice.low.toFixed(2)} V:{" "}
+        <span className="text-xs text-muted-foreground font-mono">
+          O: {formatPrice(lastPrice.open)} H: {formatPrice(lastPrice.high)} L:{" "}
+          {formatPrice(lastPrice.low)} V:{" "}
           {(lastPrice.volume / 1000000).toFixed(1)}M
         </span>
       </div>

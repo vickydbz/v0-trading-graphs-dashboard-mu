@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback } from "react";
 import { generateOHLCData, EMITENTS } from "@/lib/stock-data";
+import { useStockData } from "@/hooks/use-stock-data";
 import {
   TradingChart,
   type ChartType,
@@ -10,24 +11,30 @@ import {
 import { ChartControls } from "@/components/chart-controls";
 import { EmitentSidebar } from "@/components/emitent-sidebar";
 import { MarketOverview } from "@/components/market-overview";
-import { Activity, PanelLeftClose, PanelLeft } from "lucide-react";
+import { Activity, PanelLeftClose, PanelLeft, Wifi, WifiOff, RefreshCw } from "lucide-react";
 
 export default function TradingDashboard() {
-  const [selectedSymbol, setSelectedSymbol] = useState("AAPL");
+  const [selectedSymbol, setSelectedSymbol] = useState("BBCA.JK");
   const [chartType, setChartType] = useState<ChartType>("candlestick");
   const [indicators, setIndicators] = useState<Indicator[]>(["volume"]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  const data = useMemo(
+  const { stockData, livePrice, previousClose, isLoading, isValidating, isError } =
+    useStockData(selectedSymbol);
+
+  // Fallback to generated data if API fails
+  const fallbackData = useMemo(
     () => generateOHLCData(selectedSymbol, 365),
     [selectedSymbol]
   );
+
+  const data = stockData && stockData.length > 0 ? stockData : fallbackData;
+  const isLive = !!stockData && stockData.length > 0;
 
   const emitent = EMITENTS.find((e) => e.symbol === selectedSymbol);
 
   const toggleIndicator = useCallback((indicator: Indicator) => {
     setIndicators((prev) => {
-      // Only allow one sub-chart indicator at a time (macd, rsi, stochastic)
       const subIndicators: Indicator[] = ["macd", "rsi", "stochastic"];
       if (subIndicators.includes(indicator)) {
         const hasIt = prev.includes(indicator);
@@ -79,6 +86,32 @@ export default function TradingDashboard() {
           </div>
 
           <div className="flex items-center gap-4">
+            {/* Live status */}
+            <div className="flex items-center gap-2">
+              {isValidating && (
+                <RefreshCw className="h-3 w-3 text-muted-foreground animate-spin" />
+              )}
+              {isLive ? (
+                <div className="flex items-center gap-1.5">
+                  <Wifi className="h-3 w-3 text-[#26a65b]" />
+                  <span className="text-[9px] font-mono font-medium text-[#26a65b] uppercase">
+                    Live
+                  </span>
+                </div>
+              ) : isError ? (
+                <div className="flex items-center gap-1.5">
+                  <WifiOff className="h-3 w-3 text-[#ef5350]" />
+                  <span className="text-[9px] font-mono font-medium text-[#ef5350] uppercase">
+                    Offline
+                  </span>
+                </div>
+              ) : isLoading ? (
+                <span className="text-[9px] font-mono font-medium text-muted-foreground uppercase">
+                  Connecting...
+                </span>
+              ) : null}
+            </div>
+
             {/* Symbol info */}
             <div className="flex items-center gap-3">
               <div className="flex flex-col items-end">
@@ -125,13 +158,26 @@ export default function TradingDashboard() {
         />
 
         {/* Chart Area */}
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden relative">
+          {isLoading && !stockData && (
+            <div className="absolute inset-0 flex items-center justify-center bg-background/80 z-10">
+              <div className="flex flex-col items-center gap-2">
+                <RefreshCw className="h-5 w-5 text-muted-foreground animate-spin" />
+                <span className="text-xs text-muted-foreground font-mono">
+                  Loading live data...
+                </span>
+              </div>
+            </div>
+          )}
           <TradingChart
-            key={`${selectedSymbol}-${chartType}-${indicators.join(",")}`}
+            key={`${selectedSymbol}-${chartType}-${indicators.join(",")}-${isLive ? "live" : "fallback"}`}
             data={data}
             chartType={chartType}
             indicators={indicators}
             symbol={selectedSymbol}
+            currency={emitent?.currency}
+            livePrice={livePrice}
+            previousClose={previousClose}
           />
         </div>
 
