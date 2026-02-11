@@ -7,6 +7,25 @@ export interface OHLCData {
   volume: number;
 }
 
+export type TimeRange = "1d" | "5d" | "1mo" | "2mo" | "3mo" | "6mo" | "1y" | "max";
+
+export interface TimeRangeOption {
+  id: TimeRange;
+  label: string;
+  interval: string;
+}
+
+export const TIME_RANGES: TimeRangeOption[] = [
+  { id: "1d", label: "1D", interval: "1m" },
+  { id: "5d", label: "5D", interval: "5m" },
+  { id: "1mo", label: "1M", interval: "15m" },
+  { id: "2mo", label: "2M", interval: "1h" },
+  { id: "3mo", label: "3M", interval: "1d" },
+  { id: "6mo", label: "6M", interval: "1d" },
+  { id: "1y", label: "1Y", interval: "1d" },
+  { id: "max", label: "All", interval: "1wk" },
+];
+
 export interface Emitent {
   symbol: string;
   name: string;
@@ -46,6 +65,20 @@ export const EMITENTS: Emitent[] = [
   { symbol: "ANTM.JK", name: "Aneka Tambang", sector: "Mining", exchange: "IDX", currency: "IDR" },
   { symbol: "PGAS.JK", name: "Perusahaan Gas Negara", sector: "Energy", exchange: "IDX", currency: "IDR" },
   { symbol: "SMGR.JK", name: "Semen Indonesia", sector: "Materials", exchange: "IDX", currency: "IDR" },
+
+  // Crypto (via Yahoo Finance -USD suffix)
+  { symbol: "BTC-USD", name: "Bitcoin", sector: "Crypto", exchange: "CRYPTO", currency: "USD" },
+  { symbol: "ETH-USD", name: "Ethereum", sector: "Crypto", exchange: "CRYPTO", currency: "USD" },
+  { symbol: "BNB-USD", name: "BNB", sector: "Crypto", exchange: "CRYPTO", currency: "USD" },
+  { symbol: "SOL-USD", name: "Solana", sector: "Crypto", exchange: "CRYPTO", currency: "USD" },
+  { symbol: "XRP-USD", name: "XRP", sector: "Crypto", exchange: "CRYPTO", currency: "USD" },
+  { symbol: "ADA-USD", name: "Cardano", sector: "Crypto", exchange: "CRYPTO", currency: "USD" },
+  { symbol: "DOGE-USD", name: "Dogecoin", sector: "Crypto", exchange: "CRYPTO", currency: "USD" },
+  { symbol: "AVAX-USD", name: "Avalanche", sector: "Crypto", exchange: "CRYPTO", currency: "USD" },
+  { symbol: "DOT-USD", name: "Polkadot", sector: "Crypto", exchange: "CRYPTO", currency: "USD" },
+  { symbol: "LINK-USD", name: "Chainlink", sector: "Crypto", exchange: "CRYPTO", currency: "USD" },
+  { symbol: "MATIC-USD", name: "Polygon", sector: "Crypto", exchange: "CRYPTO", currency: "USD" },
+  { symbol: "UNI-USD", name: "Uniswap", sector: "Crypto", exchange: "CRYPTO", currency: "USD" },
 ];
 
 function seededRandom(seed: number) {
@@ -93,6 +126,19 @@ export function generateOHLCData(
     "ANTM.JK": 1500,
     "PGAS.JK": 1450,
     "SMGR.JK": 4100,
+    // Crypto
+    "BTC-USD": 67500,
+    "ETH-USD": 3450,
+    "BNB-USD": 580,
+    "SOL-USD": 145,
+    "XRP-USD": 0.62,
+    "ADA-USD": 0.45,
+    "DOGE-USD": 0.085,
+    "AVAX-USD": 35,
+    "DOT-USD": 7.2,
+    "LINK-USD": 14.5,
+    "MATIC-USD": 0.72,
+    "UNI-USD": 7.8,
   };
 
   const base = basePrices[symbol] || 100;

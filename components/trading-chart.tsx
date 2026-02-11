@@ -35,6 +35,7 @@ interface TradingChartProps {
   currency?: string;
   livePrice?: number | null;
   previousClose?: number | null;
+  compact?: boolean;
 }
 
 export function TradingChart({
@@ -45,6 +46,7 @@ export function TradingChart({
   currency = "USD",
   livePrice,
   previousClose,
+  compact = false,
 }: TradingChartProps) {
   const mainChartRef = useRef<HTMLDivElement>(null);
   const indicatorChartRef = useRef<HTMLDivElement>(null);
@@ -97,7 +99,7 @@ export function TradingChart({
     };
 
     // Main chart
-    const mainHeight = hasSubChart ? 420 : 560;
+    const mainHeight = compact ? 280 : hasSubChart ? 420 : 560;
     const mainChart = createChart(mainChartRef.current, {
       ...chartOptions,
       width: mainChartRef.current.clientWidth,

@@ -58,6 +58,11 @@ export async function GET(
     const timestamps = quote.timestamp;
     const ohlcv = quote.indicators.quote[0];
 
+    // Determine if this is intraday data
+    const intradayIntervals = ["1m", "2m", "5m", "15m", "30m", "60m", "90m", "1h"];
+    const isIntraday = intradayIntervals.includes(interval);
+
+    const seenTimes = new Set<string>();
     const data = timestamps
       .map((ts: number, i: number) => {
         const open = ohlcv.open[i];
@@ -71,14 +76,21 @@ export async function GET(
         }
 
         const date = new Date(ts * 1000);
-        const time = date.toISOString().split("T")[0];
+        // For intraday, use unix timestamp (lightweight-charts UTCTimestamp)
+        // For daily+, use YYYY-MM-DD string
+        const time = isIntraday ? ts : date.toISOString().split("T")[0];
+
+        // Deduplicate
+        const timeKey = String(time);
+        if (seenTimes.has(timeKey)) return null;
+        seenTimes.add(timeKey);
 
         return {
           time,
-          open: parseFloat(open.toFixed(2)),
-          high: parseFloat(high.toFixed(2)),
-          low: parseFloat(low.toFixed(2)),
-          close: parseFloat(close.toFixed(2)),
+          open: parseFloat(open.toFixed(4)),
+          high: parseFloat(high.toFixed(4)),
+          low: parseFloat(low.toFixed(4)),
+          close: parseFloat(close.toFixed(4)),
           volume: volume || 0,
         };
       })

@@ -34,13 +34,18 @@ const fetcher = async (url: string) => {
 };
 
 export function useStockData(symbol: string, range = "1y", interval = "1d") {
+  // Faster refresh for intraday intervals
+  const intradayIntervals = ["1m", "2m", "5m", "15m", "30m", "1h"];
+  const isIntraday = intradayIntervals.includes(interval);
+  const refreshMs = isIntraday ? 15000 : 30000;
+
   const { data, error, isLoading, isValidating } = useSWR<StockResponse>(
     `/api/stock/${encodeURIComponent(symbol)}?range=${range}&interval=${interval}`,
     fetcher,
     {
-      refreshInterval: 30000, // refresh every 30s
+      refreshInterval: refreshMs,
       revalidateOnFocus: true,
-      dedupingInterval: 10000,
+      dedupingInterval: isIntraday ? 5000 : 10000,
       errorRetryCount: 3,
       keepPreviousData: true,
     }
