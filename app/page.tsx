@@ -82,11 +82,19 @@ export default function TradingDashboard() {
             {/* Symbol info */}
             <div className="flex items-center gap-3">
               <div className="flex flex-col items-end">
-                <span className="text-lg font-bold text-foreground font-mono tracking-tight">
-                  {selectedSymbol}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg font-bold text-foreground font-mono tracking-tight">
+                    {selectedSymbol}
+                  </span>
+                  <span className="text-[9px] font-mono font-medium px-1.5 py-0.5 rounded bg-secondary text-muted-foreground">
+                    {emitent?.exchange}
+                  </span>
+                  <span className="text-[9px] font-mono font-medium px-1.5 py-0.5 rounded bg-secondary text-muted-foreground">
+                    {emitent?.currency}
+                  </span>
+                </div>
                 <span className="text-[10px] text-muted-foreground">
-                  {emitent?.name}
+                  {emitent?.name} &middot; {emitent?.sector}
                 </span>
               </div>
             </div>
@@ -128,7 +136,7 @@ export default function TradingDashboard() {
         </div>
 
         {/* Bottom Stats */}
-        <MarketOverview data={data} symbol={selectedSymbol} />
+        <MarketOverview data={data} symbol={selectedSymbol} currency={emitent?.currency} />
       </main>
     </div>
   );

@@ -11,21 +11,41 @@ export interface Emitent {
   symbol: string;
   name: string;
   sector: string;
+  exchange: string;
+  currency: string;
 }
 
 export const EMITENTS: Emitent[] = [
-  { symbol: "AAPL", name: "Apple Inc.", sector: "Technology" },
-  { symbol: "MSFT", name: "Microsoft Corp.", sector: "Technology" },
-  { symbol: "GOOGL", name: "Alphabet Inc.", sector: "Technology" },
-  { symbol: "AMZN", name: "Amazon.com Inc.", sector: "Consumer" },
-  { symbol: "TSLA", name: "Tesla Inc.", sector: "Automotive" },
-  { symbol: "NVDA", name: "NVIDIA Corp.", sector: "Semiconductors" },
-  { symbol: "META", name: "Meta Platforms Inc.", sector: "Technology" },
-  { symbol: "JPM", name: "JPMorgan Chase", sector: "Finance" },
-  { symbol: "V", name: "Visa Inc.", sector: "Finance" },
-  { symbol: "JNJ", name: "Johnson & Johnson", sector: "Healthcare" },
-  { symbol: "WMT", name: "Walmart Inc.", sector: "Consumer" },
-  { symbol: "XOM", name: "Exxon Mobil Corp.", sector: "Energy" },
+  // US Market (NASDAQ / NYSE)
+  { symbol: "AAPL", name: "Apple Inc.", sector: "Technology", exchange: "NASDAQ", currency: "USD" },
+  { symbol: "MSFT", name: "Microsoft Corp.", sector: "Technology", exchange: "NASDAQ", currency: "USD" },
+  { symbol: "GOOGL", name: "Alphabet Inc.", sector: "Technology", exchange: "NASDAQ", currency: "USD" },
+  { symbol: "AMZN", name: "Amazon.com Inc.", sector: "Consumer", exchange: "NASDAQ", currency: "USD" },
+  { symbol: "TSLA", name: "Tesla Inc.", sector: "Automotive", exchange: "NASDAQ", currency: "USD" },
+  { symbol: "NVDA", name: "NVIDIA Corp.", sector: "Semiconductors", exchange: "NASDAQ", currency: "USD" },
+  { symbol: "META", name: "Meta Platforms Inc.", sector: "Technology", exchange: "NASDAQ", currency: "USD" },
+  { symbol: "JPM", name: "JPMorgan Chase", sector: "Finance", exchange: "NYSE", currency: "USD" },
+  { symbol: "V", name: "Visa Inc.", sector: "Finance", exchange: "NYSE", currency: "USD" },
+  { symbol: "JNJ", name: "Johnson & Johnson", sector: "Healthcare", exchange: "NYSE", currency: "USD" },
+  { symbol: "WMT", name: "Walmart Inc.", sector: "Consumer", exchange: "NYSE", currency: "USD" },
+  { symbol: "XOM", name: "Exxon Mobil Corp.", sector: "Energy", exchange: "NYSE", currency: "USD" },
+
+  // Indonesia (IDX / .JK)
+  { symbol: "BBCA.JK", name: "Bank Central Asia", sector: "Finance", exchange: "IDX", currency: "IDR" },
+  { symbol: "BBRI.JK", name: "Bank Rakyat Indonesia", sector: "Finance", exchange: "IDX", currency: "IDR" },
+  { symbol: "BMRI.JK", name: "Bank Mandiri", sector: "Finance", exchange: "IDX", currency: "IDR" },
+  { symbol: "BBNI.JK", name: "Bank Negara Indonesia", sector: "Finance", exchange: "IDX", currency: "IDR" },
+  { symbol: "TLKM.JK", name: "Telkom Indonesia", sector: "Telecom", exchange: "IDX", currency: "IDR" },
+  { symbol: "ASII.JK", name: "Astra International", sector: "Automotive", exchange: "IDX", currency: "IDR" },
+  { symbol: "UNVR.JK", name: "Unilever Indonesia", sector: "Consumer", exchange: "IDX", currency: "IDR" },
+  { symbol: "INDF.JK", name: "Indofood Sukses Makmur", sector: "Consumer", exchange: "IDX", currency: "IDR" },
+  { symbol: "ICBP.JK", name: "Indofood CBP", sector: "Consumer", exchange: "IDX", currency: "IDR" },
+  { symbol: "HMSP.JK", name: "HM Sampoerna", sector: "Consumer", exchange: "IDX", currency: "IDR" },
+  { symbol: "GOTO.JK", name: "GoTo Gojek Tokopedia", sector: "Technology", exchange: "IDX", currency: "IDR" },
+  { symbol: "BRIS.JK", name: "Bank Syariah Indonesia", sector: "Finance", exchange: "IDX", currency: "IDR" },
+  { symbol: "ANTM.JK", name: "Aneka Tambang", sector: "Mining", exchange: "IDX", currency: "IDR" },
+  { symbol: "PGAS.JK", name: "Perusahaan Gas Negara", sector: "Energy", exchange: "IDX", currency: "IDR" },
+  { symbol: "SMGR.JK", name: "Semen Indonesia", sector: "Materials", exchange: "IDX", currency: "IDR" },
 ];
 
 function seededRandom(seed: number) {
@@ -57,6 +77,22 @@ export function generateOHLCData(
     JNJ: 160,
     WMT: 165,
     XOM: 105,
+    // IDX stocks (in IDR)
+    "BBCA.JK": 9800,
+    "BBRI.JK": 5400,
+    "BMRI.JK": 6200,
+    "BBNI.JK": 5100,
+    "TLKM.JK": 3800,
+    "ASII.JK": 5250,
+    "UNVR.JK": 3900,
+    "INDF.JK": 6700,
+    "ICBP.JK": 10200,
+    "HMSP.JK": 800,
+    "GOTO.JK": 72,
+    "BRIS.JK": 2550,
+    "ANTM.JK": 1500,
+    "PGAS.JK": 1450,
+    "SMGR.JK": 4100,
   };
 
   const base = basePrices[symbol] || 100;

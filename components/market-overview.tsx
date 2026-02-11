@@ -10,9 +10,10 @@ import { TrendingUp, TrendingDown, BarChart, Clock } from "lucide-react";
 interface MarketOverviewProps {
   data: OHLCData[];
   symbol: string;
+  currency?: string;
 }
 
-export function MarketOverview({ data, symbol }: MarketOverviewProps) {
+export function MarketOverview({ data, symbol, currency = "USD" }: MarketOverviewProps) {
   const stats = useMemo(() => {
     if (data.length < 2) return null;
     const last = data[data.length - 1];
@@ -44,6 +45,13 @@ export function MarketOverview({ data, symbol }: MarketOverviewProps) {
 
   const isPositive = stats.totalChange >= 0;
 
+  const formatPrice = (val: number) => {
+    if (currency === "IDR") {
+      return `Rp${val.toLocaleString("id-ID", { maximumFractionDigits: 0 })}`;
+    }
+    return `$${val.toFixed(2)}`;
+  };
+
   return (
     <div className="border-t border-border bg-card px-4 py-3">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -55,7 +63,7 @@ export function MarketOverview({ data, symbol }: MarketOverviewProps) {
         />
         <StatCard
           label="52W Range"
-          value={`$${stats.low52.toFixed(0)} - $${stats.high52.toFixed(0)}`}
+          value={`${formatPrice(stats.low52)} - ${formatPrice(stats.high52)}`}
           icon={BarChart}
         />
         <StatCard

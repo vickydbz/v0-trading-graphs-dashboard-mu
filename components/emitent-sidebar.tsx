@@ -24,7 +24,11 @@ export function EmitentSidebar({ selected, onSelect }: EmitentSidebarProps) {
       const change = last.close - prev.close;
       const changePercent = (change / prev.close) * 100;
       return {
-        ...e,
+        symbol: e.symbol,
+        name: e.name,
+        sector: e.sector,
+        exchange: e.exchange,
+        currency: e.currency,
         price: last.close,
         change,
         changePercent,
@@ -41,11 +45,17 @@ export function EmitentSidebar({ selected, onSelect }: EmitentSidebarProps) {
 
   const grouped = filtered.reduce(
     (acc, e) => {
-      if (!acc[e.sector]) acc[e.sector] = [];
-      acc[e.sector].push(e);
+      if (!acc[e.exchange]) acc[e.exchange] = [];
+      acc[e.exchange].push(e);
       return acc;
     },
     {} as Record<string, typeof filtered>
+  );
+
+  const exchangeOrder = ["NASDAQ", "NYSE", "IDX"];
+  const sortedExchanges = Object.keys(grouped).sort(
+    (a, b) => (exchangeOrder.indexOf(a) === -1 ? 99 : exchangeOrder.indexOf(a)) -
+              (exchangeOrder.indexOf(b) === -1 ? 99 : exchangeOrder.indexOf(b))
   );
 
   return (
@@ -66,47 +76,56 @@ export function EmitentSidebar({ selected, onSelect }: EmitentSidebarProps) {
       </div>
       <ScrollArea className="flex-1">
         <div className="py-2">
-          {Object.entries(grouped).map(([sector, emitents]) => (
-            <div key={sector} className="mb-2">
-              <div className="px-4 py-1.5">
+          {sortedExchanges.map((exchange) => (
+            <div key={exchange} className="mb-2">
+              <div className="px-4 py-1.5 flex items-center gap-2">
                 <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
-                  {sector}
+                  {exchange}
+                </span>
+                <span className="text-[9px] text-muted-foreground/60">
+                  {exchange === "IDX" ? "Indonesia" : "United States"}
                 </span>
               </div>
-              {emitents.map((e) => (
-                <button
-                  key={e.symbol}
-                  onClick={() => onSelect(e.symbol)}
-                  className={cn(
-                    "w-full flex items-center justify-between px-4 py-2.5 text-left transition-colors",
-                    "hover:bg-secondary/80",
-                    selected === e.symbol && "bg-secondary border-l-2 border-l-[hsl(var(--primary))]"
-                  )}
-                >
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-sm font-semibold text-foreground font-mono">
-                      {e.symbol}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground truncate max-w-[120px]">
-                      {e.name}
-                    </span>
-                  </div>
-                  <div className="flex flex-col items-end gap-0.5">
-                    <span className="text-xs font-mono text-foreground">
-                      ${e.price.toFixed(2)}
-                    </span>
-                    <span
-                      className={cn(
-                        "text-[10px] font-mono font-medium",
-                        e.isPositive ? "text-[#26a65b]" : "text-[#ef5350]"
-                      )}
-                    >
-                      {e.isPositive ? "+" : ""}
-                      {e.changePercent.toFixed(2)}%
-                    </span>
-                  </div>
-                </button>
-              ))}
+              {grouped[exchange].map((e) => {
+                const currencySymbol = e.currency === "IDR" ? "Rp" : "$";
+                const priceDisplay = e.currency === "IDR"
+                  ? `${currencySymbol}${e.price.toLocaleString("id-ID", { maximumFractionDigits: 0 })}`
+                  : `${currencySymbol}${e.price.toFixed(2)}`;
+                return (
+                  <button
+                    key={e.symbol}
+                    onClick={() => onSelect(e.symbol)}
+                    className={cn(
+                      "w-full flex items-center justify-between px-4 py-2.5 text-left transition-colors",
+                      "hover:bg-secondary/80",
+                      selected === e.symbol && "bg-secondary border-l-2 border-l-[hsl(var(--primary))]"
+                    )}
+                  >
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-sm font-semibold text-foreground font-mono">
+                        {e.symbol}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground truncate max-w-[120px]">
+                        {e.name}
+                      </span>
+                    </div>
+                    <div className="flex flex-col items-end gap-0.5">
+                      <span className="text-xs font-mono text-foreground">
+                        {priceDisplay}
+                      </span>
+                      <span
+                        className={cn(
+                          "text-[10px] font-mono font-medium",
+                          e.isPositive ? "text-[#26a65b]" : "text-[#ef5350]"
+                        )}
+                      >
+                        {e.isPositive ? "+" : ""}
+                        {e.changePercent.toFixed(2)}%
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           ))}
         </div>
